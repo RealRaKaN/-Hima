@@ -683,45 +683,49 @@
         }, { threshold: 0.5 }); // يبدأ العداد عندما يظهر 50% من القسم في الشاشة
 
         document.querySelectorAll('.metric-card').forEach(card => metricObserver.observe(card));
-        // التأثير السينمائي التفاعلي (Sticky Scroll Parallax)
+       // التأثير السينمائي التفاعلي (Sticky Scroll Parallax) مع دعم الجوال
         const videoBox = document.getElementById('video-box');
         const heroText = document.getElementById('hero-text');
         const heroOverlay = document.getElementById('hero-overlay');
         
         window.addEventListener('scroll', () => {
-            // حساب نسبة النزول (0 إلى 1) بناءً على ارتفاع الشاشة
             let scrollY = window.scrollY;
             let windowHeight = window.innerHeight;
+            let windowWidth = window.innerWidth;
+            let isMobile = windowWidth <= 768; // التعرف على شاشات الجوال
             
-            // الحد الأقصى للحركة (نهاية التأثير بعد نزول شاشة كاملة)
             let maxScroll = windowHeight; 
-            let progress = Math.min(scrollY / maxScroll, 1); // نسبة التقدم من 0 إلى 100%
+            let progress = Math.min(scrollY / maxScroll, 1); 
 
             // 1. حركة تلاشي وارتفاع النصوص
-            let textOpacity = 1 - (progress * 2); // يختفي النص سريعاً في أول 50% من النزول
-            let textY = -(progress * 300); // يرتفع للأعلى
+            let textOpacity = 1 - (progress * 2); 
+            // تقليل مسافة الارتفاع في الجوال حتى لا يختفي النص بشكل مزعج
+            let textY = -(progress * (isMobile ? 150 : 300)); 
             
             if (heroText) {
                 heroText.style.opacity = Math.max(textOpacity, 0);
                 heroText.style.transform = `translateY(${textY}px)`;
-                // إخفاء العنصر تماماً لتجنب النقر عليه وهو غير مرئي
                 heroText.style.pointerEvents = textOpacity <= 0 ? 'none' : 'auto'; 
             }
 
-            // 2. تلاشي طبقة التظليل (يصبح الفيديو صافياً)
+            // 2. تلاشي طبقة التظليل
             if (heroOverlay) {
                 heroOverlay.style.opacity = Math.max(1 - (progress * 1.5), 0);
             }
 
-            // 3. انكماش الفيديو ليصبح في إطار سينمائي واضح
+            // 3. انكماش الفيديو ليصبح في إطار سينمائي متناسق
             if (videoBox) {
-                // العرض يتغير من 100% إلى 75%
-                let currentWidth = 100 - (progress * 25);
-                // الارتفاع يتغير من 100% إلى 60%
-                let currentHeight = 100 - (progress * 40);
-                // الحواف تتغير من 0 إلى 20 بيكسل
-                let currentRadius = progress * 20;
-                // إضافة ظل (Glow) حول الفيديو عندما ينكمش
+                // تحديد الحجم المستهدف بناءً على نوع الجهاز
+                // في الكمبيوتر: عرض 75% وطول 60%
+                // في الجوال: عرض 95% وطول 30% (ليأخذ شكل الفيديو الأفقي 16:9 ويمنع القص)
+                let targetWidth = isMobile ? 95 : 60;
+                let targetHeight = isMobile ? 50 : 70;
+                
+                let currentWidth = 100 - (progress * (100 - targetWidth));
+                let currentHeight = 100 - (progress * (100 - targetHeight));
+                
+                let currentRadius = progress * (isMobile ? 12 : 20);
+                let shadowOpacity = progress * 0.3;
 
                 videoBox.style.width = `${currentWidth}%`;
                 videoBox.style.height = `${currentHeight}%`;

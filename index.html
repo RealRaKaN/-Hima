@@ -455,12 +455,16 @@
         <div class="hardware-split" style="display: block; text-align: center;">
             <div class="glass" style="padding: 2rem; border-radius: 16px;">
                 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-                <model-viewer 
-                    src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
-                    alt="A 3D model of a drone" 
-                    auto-rotate 
-                    camera-controls 
-                    style="width: 100%; height: 400px; background-color: rgba(0,0,0,0.2); border-radius: 8px;">
+                <model-viewer src="Drone.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="1" environment-image="legacy" exposure="0.28">
+                    <div class="progress-bar hide" slot="progress-bar">
+                        <div class="update-bar"></div>
+                    </div>
+                    <button slot="ar-button" id="ar-button">
+                        View in your space
+                    </button>
+                    <div id="ar-prompt">
+                        <img src="https://modelviewer.dev/shared-assets/icons/hand.png">
+                    </div>
                 </model-viewer>
                 <p data-i18n="drone_3d_desc" style="margin-top: 1rem; color: var(--text-muted);">Explore the drone hardware setup interactively.</p>
             </div>

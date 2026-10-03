@@ -42,7 +42,7 @@ window.HimaTranslations = {
         drone_3d_title: "Interactive 3D Drone Model",
         drone_3d_desc: "Explore the drone hardware setup interactively",
         tools_title: "Academic Stack & Toolchain",
-        footer_title: " ",
+        footer_title: "Why Hima ?, In authentic Arab heritage, the word 'Hima' means a safe haven and a natural reserve",
         footer_sub: "Computer Science Department, Qassim University",
         foot_github: '<i data-lucide="github" size="16"></i> GitHub Repository',
         footer_copy: "Made By @RealRaKaN. All rights reserved."
@@ -90,7 +90,7 @@ window.HimaTranslations = {
         drone_3d_title: "نموذج 3D تفاعلي للمسيّرة",
         drone_3d_desc: "استكشف إعداد وعتاد الطائرة المسيّرة بشكل تفاعلي",
         tools_title: "الحزمة الأكاديمية وسلسلة الأدوات",
-        footer_title: " ",
+        footer_title: "لماذا حِمَى؟, في التراث العربي الأصيل، كلمة 'حِمَى' تعني الملاذ الآمن والمحمية الطبيعية. ",
         footer_sub: "قسم علوم الحاسب، جامعة القصيم",
         foot_github: '<i data-lucide="github" size="16"></i> مستودع المشروع (GitHub)',
         footer_copy: "صنع بواسطة RealRaKaN@. جميع الحقوق محفوظة."

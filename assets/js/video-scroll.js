@@ -18,7 +18,6 @@
     const ease = (t) => t * t * (3 - 2 * t); // smoothstep
     let fakeFullscreen = false;
 
-    // ---- التقدم الخام من السكرول (0..1) ----
     const getTarget = () => {
         const vh = window.innerHeight;
         const heroTop = hero.getBoundingClientRect().top;
@@ -26,7 +25,6 @@
         return Math.min(Math.max(-heroTop / (range * 0.85), 0), 1);
     };
 
-    // ---- الرسم ----
     const render = (rawP) => {
         if (fakeFullscreen) return;
 
@@ -36,9 +34,8 @@
         const p = ease(rawP);
 
         const navH = navbar ? navbar.offsetHeight : 0;
-        const textH = heroText.offsetHeight; // لا يتأثر بالـ scale
+        const textH = heroText.offsetHeight;
         const baseScale = isMobile ? 0.84 : 0.75;
-        // العنوان ما ياخذ أكثر من 40% من ارتفاع الشاشة
         const endScale = Math.min(baseScale, (vh * 0.40) / textH);
         const scale = lerp(1, endScale, p);
 
@@ -74,7 +71,6 @@
         videoBox.classList.toggle('is-framed', p > 0.6);
     };
 
-    // ---- التنعيم: القيمة الحالية تلحق الهدف تدريجيًا ----
     let current = getTarget();
     let raf = null;
     const tick = () => {
@@ -102,7 +98,6 @@
     document.fonts?.ready.then(requestUpdate);
     if ('ResizeObserver' in window) new ResizeObserver(requestUpdate).observe(heroText);
 
-    // ---- إبقاء الفيديو شغال ----
     const keepVideoPlaying = () => {
         if (!document.hidden && !video.ended) {
             video.muted = true;
@@ -113,7 +108,6 @@
     document.addEventListener('fullscreenchange', () => setTimeout(keepVideoPlaying, 100));
     document.addEventListener('visibilitychange', () => { if (!document.hidden) keepVideoPlaying(); });
 
-    // ---- ملء الشاشة ----
     const setFakeFullscreen = (on) => {
         fakeFullscreen = on;
         videoBox.classList.toggle('is-fake-fullscreen', on);

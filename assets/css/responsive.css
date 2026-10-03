@@ -4,7 +4,8 @@
     }
 
     .hero-container {
-        height: 150svh;
+        /* A compact scroll range prevents an empty area before the next section. */
+        height: 120svh;
     }
 
     .sticky-wrapper {

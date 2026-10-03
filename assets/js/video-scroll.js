@@ -13,8 +13,11 @@
     const updateHero = () => {
         const viewportHeight = window.innerHeight;
         const heroTop = hero.getBoundingClientRect().top;
-        const progress = Math.min(Math.max(-heroTop / viewportHeight, 0), 1);
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const scrollRange = isMobile
+            ? Math.max(hero.offsetHeight - viewportHeight, 1)
+            : viewportHeight;
+        const progress = Math.min(Math.max(-heroTop / scrollRange, 0), 1);
         const frameWidth = isMobile ? 95 : 75;
         const targetHeight = window.innerWidth * (frameWidth / 100) * 9 / 16;
         const frameHeight = viewportHeight - progress * (viewportHeight - targetHeight);
@@ -59,6 +62,22 @@
         requestUpdate();
     }, { passive: true });
     window.addEventListener('resize', requestUpdate);
+
+    const keepVideoPlaying = () => {
+        if (!document.hidden && !video.ended) {
+            video.play().catch(() => {
+                // Some mobile browsers wait until the next user interaction to resume playback.
+            });
+        }
+    };
+
+    video.addEventListener('pause', () => window.setTimeout(keepVideoPlaying, 100));
+    document.addEventListener('fullscreenchange', () => window.setTimeout(keepVideoPlaying, 100));
+    video.addEventListener('webkitendfullscreen', () => window.setTimeout(keepVideoPlaying, 100));
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) keepVideoPlaying();
+    });
+
     fullscreenButton?.addEventListener('click', async () => {
         try {
             if (document.fullscreenElement) {
@@ -72,5 +91,6 @@
             console.warn('Unable to open video in full screen.', error);
         }
     });
+    keepVideoPlaying();
     updateHero();
 })();

@@ -71,7 +71,6 @@
 }
 .video-transform-box { top: 0; left: 50%; }
 
-/* ملء الشاشة البديل (iOS) */
 .video-transform-box.is-fake-fullscreen {
     position: fixed !important;
     top: 0 !important; left: 0 !important;
@@ -104,7 +103,6 @@
 }
 .video-transform-box.is-fake-fullscreen .video-close-btn { display: block; }
 
-/* هذا هو إصلاح القص في سفاري */
 html.video-fs-open .hero-container,
 html.video-fs-open .sticky-wrapper {
     overflow: visible !important;
@@ -113,7 +111,6 @@ html.video-fs-open .sticky-wrapper {
 html.video-fs-open, body.video-fs-open { overflow: hidden; }
 body.video-fs-open nav { display: none; }
 
-/* الشاشات القصيرة (جوال أفقي): نخفي الشارة والوصف عشان ما يتداخل */
 @media (max-height: 500px) {
     .hero-content .subtitle,
     .hero-content .badge-academic { display: none; }

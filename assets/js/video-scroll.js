@@ -15,21 +15,33 @@
         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
     const lerp = (a, b, t) => a + (b - a) * t;
+    const ease = (t) => t * t * (3 - 2 * t); // smoothstep
+    let fakeFullscreen = false;
 
-    const updateHero = () => {
+    // ---- التقدم الخام من السكرول (0..1) ----
+    const getTarget = () => {
+        const vh = window.innerHeight;
+        const heroTop = hero.getBoundingClientRect().top;
+        const range = Math.max(hero.offsetHeight - vh, 1);
+        return Math.min(Math.max(-heroTop / (range * 0.85), 0), 1);
+    };
+
+    // ---- الرسم ----
+    const render = (rawP) => {
+        if (fakeFullscreen) return;
+
         const vh = window.innerHeight;
         const vw = document.documentElement.clientWidth;
-        const heroTop = hero.getBoundingClientRect().top;
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
-        const scrollRange = isMobile ? Math.max(hero.offsetHeight - vh, 1) : vh;
-        const progress = Math.min(Math.max(-heroTop / scrollRange, 0), 1);
-        const p = Math.min(progress * 2, 1); 
+        const p = ease(rawP);
 
         const navH = navbar ? navbar.offsetHeight : 0;
-        const textH = heroText.offsetHeight;          
-        const endScale = isMobile ? 0.84 : 0.75;
+        const textH = heroText.offsetHeight; // لا يتأثر بالـ scale
+        const baseScale = isMobile ? 0.84 : 0.75;
+        // العنوان ما ياخذ أكثر من 40% من ارتفاع الشاشة
+        const endScale = Math.min(baseScale, (vh * 0.40) / textH);
         const scale = lerp(1, endScale, p);
+
         const textTopStart = (vh - textH) / 2;
         const textTopEnd = navH + 8;
         const textTop = lerp(textTopStart, textTopEnd, p);
@@ -50,8 +62,7 @@
         heroText.style.transformOrigin = 'top center';
         heroText.style.transform = `scale(${scale})`;
         heroText.style.opacity = 1;
-        heroText.style.pointerEvents = 'auto';
-        heroOverlay.style.opacity = Math.max(1 - progress * 1.5, 0);
+        heroOverlay.style.opacity = Math.max(1 - p * 1.3, 0);
 
         videoBox.style.left = '50%';
         videoBox.style.transform = 'translateX(-50%)';
@@ -60,18 +71,20 @@
         videoBox.style.top = `${lerp(0, videoTopEnd, p)}px`;
         videoBox.style.borderRadius = `${p * (isMobile ? 12 : 20)}px`;
         videoBox.style.boxShadow = `0 20px 50px rgba(0,0,0,.8), 0 0 30px rgba(16,185,129,${p * 0.3})`;
-        videoBox.classList.toggle('is-framed', p > 0.35);
+        videoBox.classList.toggle('is-framed', p > 0.6);
     };
 
-    let frameRequested = false;
-    const requestUpdate = () => {
-        if (frameRequested) return;
-        frameRequested = true;
-        requestAnimationFrame(() => {
-            updateHero();
-            frameRequested = false;
-        });
+    // ---- التنعيم: القيمة الحالية تلحق الهدف تدريجيًا ----
+    let current = getTarget();
+    let raf = null;
+    const tick = () => {
+        const target = getTarget();
+        current += (target - current) * 0.14;
+        if (Math.abs(target - current) < 0.0005) current = target;
+        try { render(current); } catch (e) { console.error(e); }
+        raf = current !== target ? requestAnimationFrame(tick) : null;
     };
+    const requestUpdate = () => { if (!raf) raf = requestAnimationFrame(tick); };
 
     const updateNavigation = () => {
         const y = window.scrollY;
@@ -84,10 +97,12 @@
         requestUpdate();
     }, { passive: true });
     window.addEventListener('resize', requestUpdate);
+    window.addEventListener('orientationchange', () => setTimeout(requestUpdate, 300));
     window.addEventListener('load', requestUpdate);
     document.fonts?.ready.then(requestUpdate);
     if ('ResizeObserver' in window) new ResizeObserver(requestUpdate).observe(heroText);
 
+    // ---- إبقاء الفيديو شغال ----
     const keepVideoPlaying = () => {
         if (!document.hidden && !video.ended) {
             video.muted = true;
@@ -97,37 +112,31 @@
     video.addEventListener('pause', () => setTimeout(keepVideoPlaying, 100));
     document.addEventListener('fullscreenchange', () => setTimeout(keepVideoPlaying, 100));
     document.addEventListener('visibilitychange', () => { if (!document.hidden) keepVideoPlaying(); });
-    video.addEventListener('webkitendfullscreen', () => {
-        keepVideoPlaying();
-        setTimeout(keepVideoPlaying, 200);
-        setTimeout(keepVideoPlaying, 500);
-    });
 
+    // ---- ملء الشاشة ----
     const setFakeFullscreen = (on) => {
+        fakeFullscreen = on;
         videoBox.classList.toggle('is-fake-fullscreen', on);
+        document.documentElement.classList.toggle('video-fs-open', on);
         document.body.classList.toggle('video-fs-open', on);
+        if (!on) requestUpdate();
         keepVideoPlaying();
     };
 
     fullscreenButton?.addEventListener('click', async () => {
         try {
-            if (isIOS) {
-                setFakeFullscreen(true);
-            } else if (document.fullscreenElement) {
-                await document.exitFullscreen();
-            } else if (video.requestFullscreen) {
-                await video.requestFullscreen();
-            }
+            if (isIOS) setFakeFullscreen(true);
+            else if (document.fullscreenElement) await document.exitFullscreen();
+            else if (video.requestFullscreen) await video.requestFullscreen();
         } catch (e) {
             console.warn('Unable to open video in full screen.', e);
         }
     });
-
     closeButton?.addEventListener('click', () => setFakeFullscreen(false));
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') setFakeFullscreen(false);
     });
 
     keepVideoPlaying();
-    updateHero();
+    render(current);
 })();

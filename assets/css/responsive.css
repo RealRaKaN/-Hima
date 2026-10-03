@@ -3,14 +3,7 @@
         padding-inline: 1rem;
     }
 
-    .hero-container {
-        /* A compact scroll range prevents an empty area before the next section. */
-        height: 120svh;
-    }
-
-    .sticky-wrapper {
-        height: 100svh;
-    }
+    .hero-container { height: 170svh; }
 
     .hero-content {
         width: min(100%, 42rem);
@@ -76,20 +69,57 @@
     transform: translate(-50%, .5rem);
     transition: opacity .25s ease, transform .25s ease, background-color .25s ease;
 }
+.video-transform-box { top: 0; left: 50%; }
 
-.video-transform-box.is-framed .video-fullscreen-btn {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translate(-50%, 0);
+/* ملء الشاشة البديل (iOS) */
+.video-transform-box.is-fake-fullscreen {
+    position: fixed !important;
+    top: 0 !important; left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    z-index: 5000;
+    background: #000;
 }
+.video-transform-box.is-fake-fullscreen .hero-video { object-fit: contain; }
+.video-transform-box.is-fake-fullscreen .hero-overlay,
+.video-transform-box.is-fake-fullscreen .video-fullscreen-btn { display: none; }
 
-.video-fullscreen-btn:hover,
-.video-fullscreen-btn:focus-visible {
-    background: var(--primary-accent);
-    outline: 2px solid var(--primary-light);
-    outline-offset: 3px;
+.video-close-btn {
+    display: none;
+    position: absolute;
+    z-index: 4;
+    top: calc(env(safe-area-inset-top, 0px) + .75rem);
+    right: .75rem;
+    width: 2.5rem; height: 2.5rem;
+    color: #fff;
+    background: rgba(7, 18, 11, .75);
+    border: 1px solid rgba(16, 185, 129, .55);
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
 }
+.video-transform-box.is-fake-fullscreen .video-close-btn { display: block; }
 
+/* هذا هو إصلاح القص في سفاري */
+html.video-fs-open .hero-container,
+html.video-fs-open .sticky-wrapper {
+    overflow: visible !important;
+    z-index: 5000;
+}
+html.video-fs-open, body.video-fs-open { overflow: hidden; }
+body.video-fs-open nav { display: none; }
+
+/* الشاشات القصيرة (جوال أفقي): نخفي الشارة والوصف عشان ما يتداخل */
+@media (max-height: 500px) {
+    .hero-content .subtitle,
+    .hero-content .badge-academic { display: none; }
+    .hero-content .project-name { font-size: 2.2rem !important; margin-bottom: .25rem; }
+    .hero-content h2 { font-size: 1.1rem !important; margin-bottom: 0; }
+}
 nav {
     transition: transform .28s ease, background-color .28s ease;
 }

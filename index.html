@@ -13,12 +13,13 @@
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
 <body>
-
+    <div id="shader-bg" aria-hidden="true"></div>
     <!-- Nav -->
     <nav id="navbar">
         <div class="container nav-container">
@@ -57,6 +58,7 @@
                 <button class="video-fullscreen-btn" id="video-fullscreen-btn" type="button" aria-label="Open video in full screen">
                     <i data-lucide="maximize" size="16"></i>
                     <span data-i18n="video_fullscreen">Full screen</span>
+                    <button class="video-close-btn" id="video-close-btn" type="button" aria-label="Close full screen">✕</button>
                 </button>
             </div>
 
@@ -89,7 +91,7 @@
             <div class="glass metric-card">
                 <i data-lucide="target" size="32" class="metric-icon"></i>
 
-                <div class="metric-value counter" data-target="90" data-suffix="%">0</div>
+                <div class="metric-value counter" data-target="95" data-suffix="%">0</div>
                 <div class="metric-title" data-i18n="metric_map_title">mAP@0.50 Precision</div>
                 <div class="metric-subtitle" data-i18n="metric_map_sub">COCO Evaluation Protocol</div>
             </div>
@@ -252,5 +254,6 @@
     <script src="assets/js/translations.js" defer></script>
     <script src="assets/js/app.js" defer></script>
     <script src="assets/js/video-scroll.js" defer></script>
+    <script src="assets/js/shader-bg.js" defer></script>
 </body>
 </html>
